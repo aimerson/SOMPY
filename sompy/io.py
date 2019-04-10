@@ -35,10 +35,10 @@ class OutputToHDF5(HDF5):
         attrib["initialized"] = codebook.initialized
         attrib["mapsize"] = codebook.mapsize
         self.addAttributes("/codebook",attrib)                
-        self.writeDataset(codebook.matrix,"matrix",hdfdir="/codebook")
+        self.writeSOMDataset(codebook.matrix,"matrix",hdfdir="/codebook")
         return
 
-    def writeDataset(self,arr,name,hdfdir="/",verbose=False):
+    def writeSOMDataset(self,arr,name,hdfdir="/",verbose=False):
         funcname = self.__class__.__name__+"."+sys._getframe().f_code.co_name
         if verbose:
             print("Writing "+name+" to file...")
@@ -63,18 +63,18 @@ class OutputToHDF5(HDF5):
         # Write attributes to file
         self.addAttributes("/",attrib)                
         # Write BMU
-        self.writeDataset(SOM._bmu,"_bmu",hdfdir="/",verbose=verbose)
+        self.writeSOMDataset(SOM._bmu,"_bmu",hdfdir="/",verbose=verbose)
         # Write mask
-        self.writeDataset(SOM.mask,"mask",hdfdir="/",verbose=verbose)
+        self.writeSOMDataset(SOM.mask,"mask",hdfdir="/",verbose=verbose)
         # Write _data
         if storeNormalizedData:
-            self.writeDataset(SOM._data,"_data",hdfdir="/",verbose=verbose)
+            self.writeSOMDataset(SOM._data,"_data",hdfdir="/",verbose=verbose)
         # Write data_raw
-        self.writeDataset(SOM.data_raw,"data_raw",hdfdir="/",verbose=verbose)
+        self.writeSOMDataset(SOM.data_raw,"data_raw",hdfdir="/",verbose=verbose)
         # Write distance matrix
-        self.writeDataset(SOM._distance_matrix,"_distance_matrix",hdfdir="/",verbose=verbose)
+        self.writeSOMDataset(SOM._distance_matrix,"_distance_matrix",hdfdir="/",verbose=verbose)
         # Write component names
-        self.writeDataset(np.array(SOM._component_names),"_component_names",hdfdir="/",verbose=verbose)
+        self.writeSOMDataset(np.array(SOM._component_names),"_component_names",hdfdir="/",verbose=verbose)
         # Write codebook
         self.writeCodebook(SOM.codebook,verbose=verbose)
         return

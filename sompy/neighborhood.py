@@ -20,6 +20,8 @@ class NeighborhoodFactory(object):
 
 class GaussianNeighborhood(object):
 
+    name = 'gaussian'
+
     def __init__(self):
         self.name = 'gaussian'
         return
@@ -33,6 +35,8 @@ class GaussianNeighborhood(object):
 
 
 class BubbleNeighborhood(object):
+
+    name = 'bubble'
     
     def __init__(self):
         self.name = 'bubble'
