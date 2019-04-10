@@ -26,8 +26,12 @@ import sys
 from .decorators import timeit
 from .codebook import Codebook
 from .neighborhood import NeighborhoodFactory
-from .normalization import NormalizerFactory
+from .normalization import NormalizatorFactory
 
+#lbugnon
+#import ipdb
+import sompy
+#
 
 class ComponentNamesError(Exception):
     pass
@@ -74,7 +78,7 @@ class SOMFactory(object):
 
         :param lattice: type of lattice. Options are:
             - rect
-            - hexa
+            - hexa (not implemented yet)
 
         :param initialization: method to be used for initialization of the som.
             Options are:
@@ -85,7 +89,7 @@ class SOMFactory(object):
         :param training: Training mode (seq, batch)
         """
         if normalization:
-            normalizer = NormalizerFactory.build(normalization)
+            normalizer = NormalizatorFactory.build(normalization)
         else:
             normalizer = None
         neighborhood_calculator = NeighborhoodFactory.build(neighborhood)
@@ -619,20 +623,8 @@ class SOM(object):
     def calculate_topographic_error(self):
         bmus1 = self.find_bmu(self.data_raw, njb=1, nth=1)
         bmus2 = self.find_bmu(self.data_raw, njb=1, nth=2)
-        topographic_error = None
-        if self.codebook.lattice=="rect":
-            bmus_gap = np.abs((self.bmu_ind_to_xy(np.array(bmus1[0]))[:, 0:2] - self.bmu_ind_to_xy(np.array(bmus2[0]))[:, 0:2]).sum(axis=1))
-            topographic_error = np.mean(bmus_gap != 1)
-        elif self.codebook.lattice=="hexa":
-            dist_matrix_1 = self.codebook.lattice_distances[bmus1[0].astype(int)].reshape(len(bmus1[0]), -1)
-            topographic_error = (np.array(
-                [distances[bmu2] for bmu2, distances in zip(bmus2[0].astype(int), dist_matrix_1)]) > 2).mean()
-        return(topographic_error)
-
-    def calculate_quantization_error(self):
-        neuron_values = self.codebook.matrix[self.find_bmu(self._data)[0].astype(int)]
-        quantization_error = np.mean(np.abs(neuron_values - self._data))
-        return quantization_error
+        bmus_gap = np.abs((self.bmu_ind_to_xy(np.array(bmus1[0]))[:, 0:2] - self.bmu_ind_to_xy(np.array(bmus2[0]))[:, 0:2]).sum(axis=1))
+        return np.mean(bmus_gap != 1)
 
     def calculate_map_size(self, lattice):
         """

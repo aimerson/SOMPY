@@ -3,46 +3,11 @@
 __author__ = ("Alex Merson")
 __version__ = "1.0.0"
 
-import six
 import sys,os
 import h5py
 import numpy as np
 import fnmatch
 import unittest
-
-def removeByteStrings(value):
-    if np.ndim(value)==0:
-        result = value
-        if isinstance(value,bytes):
-            result = str(value,encoding='utf-8')
-        return result
-    if isinstance(value,dict):
-        result = {removeByteStrings(key):removeByteStrings(value[key]) for key in value.keys()}
-    elif isinstance(value,np.ndarray):
-        result = [removeByteStrings(x) for x in value]
-        result = np.array(result)
-    else:
-        dt = type(value)
-        result = [removeByteStrings(x) for x in value]
-        result = dt(result)
-    return result
-
-def addByteStrings(value):
-    if np.ndim(value)==0:
-        result = value
-        if isinstance(result,str):
-            result = np.string_(result)
-        return result
-    if isinstance(value,dict):
-        result = {addByteStrings(key):addByteStrings(value[key]) for key in value.keys()}
-    elif isinstance(value,np.ndarray):
-        result = [addByteStrings(x) for x in value]
-        result = np.array(result)
-    else:
-        dt = type(value)
-        result = [addByteStrings(x) for x in value]
-        result = dt(result)
-    return result
 
 def flattenNestedList(l):
     return [item for sublist in l for item in sublist]
@@ -440,48 +405,41 @@ class HDF5(object):
     ##############################################################################
     
     def readAttributes(self,hdfdir,required=None):
-        funcname = self.__class__.__name__+"."+sys._getframe().f_code.co_name
-        if required is None:
-            attr = dict(self.fileObj[hdfdir].attrs)
+        funcname = self.__class__.__name__+"."+sys._getframe().f_code.co_name        
+        if required is None:        
+            return dict(self.fileObj[hdfdir].attrs)
         else:
             good = list(set(required).intersection(self.fileObj[hdfdir].attrs.keys()))
-            bad = list(set(required).difference(self.fileObj[hdfdir].attrs.keys()))
+            bad = list(set(required).difference(self.fileObj[hdfdir].attrs.keys()))            
             if self.verbose:
                 if len(bad)>0:
-                    warnings.warn(funcname+"(): Following attributes not present in '"+
-                                  hdfdir+"':"+",".join(bad))
+                    linereturn = "\n         "
+                    print("WARNING! "+funcname+"(): Following attributes not present in '"+hdfdir+\
+                              "':"+linereturn+linereturn.join(bad))
             if len(good)==0:
                 return {}
-            attr = {g:self.fileObj[hdfdir].attrs[g] for g in good}
-        if six.PY3:
-            attr = {removeByteStrings(key):removeByteStrings(value) for key,value in attr.items()}
-        return attr
+            else:
+                return {str(g):self.fileObj[hdfdir].attrs[g] for g in good}
     
     @readonlyWrapper
     def addAttributes(self,hdfdir,attributes,overwrite=False):
-        funcname = self.__class__.__name__+"."+sys._getframe().f_code.co_name
+        funcname = self.__class__.__name__+"."+sys._getframe().f_code.co_name        
         if hdfdir not in self.fileObj:
-            raise KeyError(funcname+"(): '"+hdfdir+"' not found in HDF5 file!")
+            raise KeyError(funcname+"(): '"+hdfdir+"' not found in HDF5 file!")                
         attrib = self.fileObj[hdfdir].attrs
         for att in attributes.keys():
             if att in self.fileObj[hdfdir].attrs.keys():
                 if self.verbose:
-                    warnings.warn(funcname+"(): Attribute '"+att+"' already exists!")
+                        print("WARNING! "+funcname+"(): Attribute '"+att+"' already exists!")
                 if overwrite:
                     if self.verbose:
-                        print("        Overwriting attribute '"+att+"'")
-                    if six.PY3:
-                        attrib.create(att,addByteStrings(attributes[att]),shape=None,dtype=None)
-                    else:
-                        attrib.create(att,attributes[att],shape=None,dtype=None)
+                        print("        Overwriting attribute '"+att+"'")                        
+                    attrib.create(att,attributes[att],shape=None,dtype=None)
                 else:
                     if self.verbose:
-                        print("        Ignoring attribute '"+att+"'")
+                        print("        Ignoring attribute '"+att+"'")                        
             else:
-                if six.PY3:
-                    attrib.create(att,addByteStrings(attributes[att]),shape=None,dtype=None)
-                else:
-                    attrib.create(att,attributes[att],shape=None,dtype=None)
+                attrib.create(att,attributes[att],shape=None,dtype=None)
         return
 
     @readonlyWrapper

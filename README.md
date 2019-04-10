@@ -23,6 +23,7 @@ SOMPY has the following dependencies (tested only with Python 2.7x):
 - pandas
 - ipdb
 - h5py
+- six
 
 ### Installation:
 ```Python

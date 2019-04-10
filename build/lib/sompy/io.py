@@ -5,7 +5,7 @@ __version__ = "1.0.0"
 
 import sys,fnmatch
 import numpy as np
-from .hdf5 import HDF5,addByteStrings,removeByteStrings
+from .hdf5 import HDF5
 from .codebook import Codebook
 from .sompy import SOM
 
@@ -74,8 +74,7 @@ class OutputToHDF5(HDF5):
         # Write distance matrix
         self.writeSOMDataset(SOM._distance_matrix,"_distance_matrix",hdfdir="/",verbose=verbose)
         # Write component names
-        self.writeSOMDataset(addByteStrings(np.array(SOM._component_names)),"_component_names",
-                             hdfdir="/",verbose=verbose)
+        self.writeSOMDataset(np.array(SOM._component_names),"_component_names",hdfdir="/",verbose=verbose)
         # Write codebook
         self.writeCodebook(SOM.codebook,verbose=verbose)
         return
@@ -166,7 +165,7 @@ class InputFromHDF5(HDF5):
         # Extract raw data
         data = np.array(self.fileObj["/data_raw"])
         # Extract component names
-        components = removeByteStrings(np.array(self.fileObj["/_component_names"]))
+        components = np.array(self.fileObj["/_component_names"])        
         # Create neighborhood and normalizer classes
         neighborhood = self.createNeighborhood(verbose=verbose)
         normalizer = self.createNormalizer(verbose=verbose)

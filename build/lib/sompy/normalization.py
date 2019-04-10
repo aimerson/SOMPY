@@ -3,7 +3,7 @@ import sys
 import inspect
 
 
-class NormalizerFactory(object):
+class NormalizatorFactory(object):
 
     @staticmethod
     def build(type_name):
@@ -15,7 +15,7 @@ class NormalizerFactory(object):
             raise Exception("Unknown normalization type '%s'" % type_name)
 
 
-class Normalizer(object):
+class Normalizator(object):
 
     def normalize(self, data):
         raise NotImplementedError()
@@ -27,7 +27,7 @@ class Normalizer(object):
         raise NotImplementedError()
 
 
-class VarianceNormalizer(Normalizer):
+class VarianceNormalizator(Normalizator):
 
     name = 'var'
 
@@ -49,26 +49,26 @@ class VarianceNormalizer(Normalizer):
         return n_vect * st + me
 
 
-class RangeNormalizer(Normalizer):
+class RangeNormalizator(Normalizator):
 
     name = 'range'
 
 
-class LogNormalizer(Normalizer):
+class LogNormalizator(Normalizator):
 
     name = 'log'
 
 
-class LogisticNormalizer(Normalizer):
+class LogisticNormalizator(Normalizator):
 
     name = 'logistic'
 
 
-class HistDNormalizer(Normalizer):
+class HistDNormalizator(Normalizator):
 
     name = 'histd'
 
 
-class HistCNormalizer(Normalizer):
+class HistCNormalizator(Normalizator):
 
     name = 'histc'

@@ -1,5 +1,4 @@
 import numpy as np
-import scipy as sp
 
 from sklearn.decomposition import PCA
 #from sklearn.decomposition import RandomizedPCA# (randomizedpca is deprecated)
@@ -12,16 +11,6 @@ class InvalidNodeIndexError(Exception):
 
 class InvalidMapsizeError(Exception):
     pass
-
-def generate_hex_lattice(n_rows, n_columns):
-    x_coord = []
-    y_coord = []
-    for i in range(n_rows):
-        for j in range(n_columns):
-            x_coord.append(i*1.5)
-            y_coord.append(np.sqrt(2/3)*(2*j+(1+i)%2))
-    coordinates = np.column_stack([x_coord, y_coord])
-    return coordinates
 
 
 class Codebook(object):
@@ -44,12 +33,6 @@ class Codebook(object):
         self.nnodes = mapsize[0]*mapsize[1]
         self.matrix = np.asarray(self.mapsize)
         self.initialized = False
-
-        if lattice == "hexa":
-            n_rows, n_columns = mapsize
-            coordinates = generate_hex_lattice(n_rows, n_columns)
-            self.lattice_distances = (sp.spatial.distance_matrix(coordinates, coordinates)
-                                      .reshape(n_rows * n_columns, n_rows, n_columns))
 
     @timeit()
     def random_initialization(self, data):
@@ -146,7 +129,7 @@ class Codebook(object):
             return self._hexa_dist(node_ind)
 
     def _hexa_dist(self, node_ind):
-        return self.lattice_distances[node_ind]
+        raise NotImplementedError()
 
     def _rect_dist(self, node_ind):
         """
